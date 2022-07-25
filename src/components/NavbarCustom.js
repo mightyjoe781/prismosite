@@ -28,10 +28,7 @@ function NavbarCustom(args) {
         <Collapse isOpen={isOpen} navbar>
           <Nav className="me-auto" navbar>
             <NavItem>
-              <NavLink href="/staff/">Components</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="https://github.com/mightyjoe781">GitHub</NavLink>
+              <NavLink href="https://github.com/mightyjoe781/prismosite">GitHub</NavLink>
             </NavItem>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>
@@ -51,7 +48,7 @@ function NavbarCustom(args) {
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>
-          <NavbarText>Simple Text</NavbarText>
+          <NavbarText>A MultiCraft Server</NavbarText>
         </Collapse>
       </Navbar>
     </div>

@@ -13,6 +13,33 @@ async function fetchServerInfo() {
    });
 }
 
+function countdown(s) {
+
+  const d = Math.floor(s / (3600 * 24));
+
+  s  -= d * 3600 * 24;
+
+  const h = Math.floor(s / 3600);
+
+  s  -= h * 3600;
+
+  const m = Math.floor(s / 60);
+
+  s  -= m * 60;
+
+  const tmp = [];
+
+  (d) && tmp.push(d + 'd');
+
+  (d || h) && tmp.push(h + 'h');
+
+  (d || h || m) && tmp.push(m + 'm');
+
+  tmp.push(s + 's');
+
+  return tmp.join(' ');
+}
+
 function ServerInfo (props) {
     const serverName = props.value;
     const [server, setServer] = useState(()=> {
@@ -54,6 +81,8 @@ function ServerInfo (props) {
     }
 
     const playerCount = server.clients
+    const restartTime = new Date(new Date() - server.uptime*1000).toLocaleString()
+    const elapsedTime = countdown(server.uptime)
     return (
         <div className='container'>
             <div>
@@ -63,7 +92,10 @@ function ServerInfo (props) {
                 All time player count : {server.total_clients}
             </div>
             <div>
-                Current Lag : <span style={server.ping > 0.1? {color:"red"}: {color:"green"}} children={server.ping} />
+                Current Lag : <span style={server.ping > 0.1? {color:"red"}: {color:"green"}} children={server.ping.toFixed(5)} /> ms
+            </div>
+            <div>
+                Last server restart time : {restartTime} ({elapsedTime} ago)
             </div>
             <ul>
                 {server.clients_list.map((playerName,i) => <li key={i} >{playerName}</li>) }
