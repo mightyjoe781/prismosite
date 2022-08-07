@@ -1,86 +1,60 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Navbar from './components/NavbarCustom.js'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+import {Row,Col, Container, Spinner} from 'reactstrap'
 
 async function fetchServerInfo() {
-   return fetch('https://servers.minetest.net/list')
-   .then((response) => response.json())
-   .then((responseJson) => {
-     return responseJson.list
-   })
-   .catch((error) => {
-     console.error(error);
-   });
+    try {
+        var res = await fetch('https://servers.minetest.net/list')
+        return await res.json()
+    } catch(err) {
+        console.log(err)
+    }
 }
 
 function countdown(s) {
-
   const d = Math.floor(s / (3600 * 24));
-
   s  -= d * 3600 * 24;
-
   const h = Math.floor(s / 3600);
-
   s  -= h * 3600;
-
   const m = Math.floor(s / 60);
-
   s  -= m * 60;
-
   const tmp = [];
-
   (d) && tmp.push(d + 'd');
-
   (d || h) && tmp.push(h + 'h');
-
   (d || h || m) && tmp.push(m + 'm');
-
   tmp.push(s + 's');
-
   return tmp.join(' ');
 }
 
 function ServerInfo (props) {
     const serverName = props.value;
-    const [server, setServer] = useState(()=> {
+    const [server, setServer] = useState("")
+
+    useEffect(()=>{
+        console.log("Use Effect Called")
+        let timer = setInterval(()=>
         fetchServerInfo().then(
-            result => {
-                result.forEach(srv => {
+            results => {
+                results.list.forEach(srv => {
                     if(srv.name === serverName) {
                         setServer(srv)
-                        console.log(srv)
                     }
                 })
-            }
-        )
-    });
-
-    React.useEffect(
-        ()=>{
-        console.log("Use Effect is called")
-        let timer1 = setInterval(()=>
-        fetchServerInfo().then(
-                result => {
-                    result.forEach(srv => {
-                        if(srv.name === serverName) {
-                            setServer(srv)
-                        }
-                    })
-                }
-        ), 5000)
+            }), 5000)
         return ()=> {
             // cleanup call
             console.log("Cleanup!")
-            clearInterval(timer1)
+            clearInterval(timer)
         }
-    },[serverName]);
+    }, [serverName]);
 
+    const playerCount = (server) ? server.clients : (<Spinner size="sm" />)
     if(!server) {
-        const playerCount = 'Resolving Request...'
-        return <PlayerCount {...props} playerCount={playerCount} />
+        return (
+            <PlayerCount {...props} playerCount={playerCount} />
+        )
     }
-
-    const playerCount = server.clients
     const restartTime = new Date(new Date() - server.uptime*1000).toLocaleString()
     const elapsedTime = countdown(server.uptime)
     return (
@@ -114,13 +88,20 @@ function PlayerCount (props) {
     );
 }
 
-
 function App() {
   return (
     <div>
-      <Navbar />
-      <ServerInfo value="Prismo" />
-      <ServerInfo value="Adventure Time" />
+      <Navbar color="dark" dark="true" expand="md" container="fluid" />
+      <Container className='bg-light border'>
+        <Row xs="1" sm="2" md="2" lg="2">
+            <Col className='border'>
+              <ServerInfo value="Prismo" />
+            </Col>
+            <Col className='border'>
+              <ServerInfo value="Adventure Time" />
+            </Col>
+        </Row>
+      </Container>
     </div>
   );
 }
